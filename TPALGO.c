@@ -36,6 +36,7 @@ void MaxColonne();
 void affvect(float * vect, int n);
 void swpVect(float * a, float * b, int n);
 void kMat();
+bool methGausse(mtr * m1);
 
 
 void main_menu()
@@ -72,7 +73,7 @@ void main_menu()
 void AOM_menu()
 {
     system("cls");
-    printf("------------------------------------------AUTRES OPERATIOS SUR LES MATRICES-------------------------------------------\n");
+    printf("------------------------------------------AUTRES OPERATIONS SUR LES MATRICES-------------------------------------------\n");
     int x;
     printf("\n\n\n\t\t\t\t\t1. Transposee d'une matrice");
     printf("\n\n\n\t\t\t\t\t2. Tri d'une matrice");
@@ -505,12 +506,101 @@ bool detNul(mtr * m)
     {
         for(int j = i+1; j<m->n; j++)
         {
-            if(linDpt(m->A[i], m->A[j], m->m) || linDpt(m2->A[i], m2->A[j], m2->m))
+            if(linDpt(m->A[i], m->A[j], m->m) || linDpt(m2->A[i], m2->A[j], m2->m) || methGausse(m))
             {
                 m2 = libererMat(m2);
                 return true;
             }
         }
+    }
+
+    return false;
+}
+
+bool methGausse(mtr * m)
+{
+
+    mtr * m1;
+    m1 = allMat(m1, m->n, m->m);
+
+    for(int i = 0; i< m1->m; i++)
+    {
+        for(int j = 0; j<m1->m; j++)
+        {
+            m1->A[i][j] = m->A[i][j];
+        }
+    }
+
+
+
+    float x, y;
+
+    for(int i = 0; i< m1->n -1 ; i++)
+    {
+        if(m1->A[i][i] == 0)
+        {
+            for(int j = i+1; j<m1->m; j++)
+            {
+                if(m1->A[j][i] == 0)
+                {
+                    continue;
+                }
+                else
+                {
+                    swpVect(m1->A[j], m1->A[i], m1->m);
+                    break;
+                }
+            }
+        }
+        x = m1->A[i][i];
+
+        if(x==0)
+        {
+            continue;
+        }
+
+        for(int f = 0; f<m1->n; f++)
+        {
+            m1->A[i][f] = m1->A[i][f] / x;
+        }
+
+        x = m1->A[i][i];
+        for(int j = i+1 ; j<m1->n; j++)
+        {
+            y = m1->A[j][i];
+            if(y == 0)
+            {
+                continue;
+            }
+
+            for(int f = 0; f<m1->n; f++)
+            {
+                m1->A[i][f] = m1->A[i][f] * y;
+            }
+
+            for(int f = 0; f<m1->n; f++)
+            {
+                m1->A[j][f] -= m1->A[i][f];
+                
+            }
+            for(int f = 0; f<m1->n; f++)
+            {
+                m1->A[i][f] = m1->A[i][f] / y;
+            }
+        }
+    }
+
+    x = 1;
+    for(int i = 0; i< m1->m; i++)
+    {
+        x = x * m1->A[i][i];
+    }
+
+    m1 = libererMat(m1);
+
+    if(x == 0)
+    {
+        return true;
     }
 
     return false;
@@ -560,35 +650,30 @@ mtr * echMat(mtr * m1)
 {
     mtr * m2;
     m2 = idMat(m1);
-    float * p;
-    p = (float*)malloc(m1->n*sizeof(float));
+
+
     float x,y,z;
-    
-    for(int i = 0; i< m1->m; i++)
+
+    for(int i = 0; i< m1->n -1 ; i++)
     {
         if(m1->A[i][i] == 0)
         {
             for(int j = i+1; j<m1->m; j++)
             {
-                if(m1->A[i+j][i] == 0)
+                if(m1->A[j][i] == 0)
                 {
                     continue;
                 }
                 else
                 {
-                    swpVect(m1->A[i+j], m1->A[i], m1->m);
-                    swpVect(m2->A[i+j], m2->A[i], m2->m);
+                    swpVect(m1->A[j], m1->A[i], m1->m);
+                    swpVect(m2->A[j], m2->A[i], m2->m);
                     break;
                 }
             }
 
         }
 
-    }
-
-
-    for(int i = 0; i< m1->n -1 ; i++)
-    {
         x = m1->A[i][i];
         for(int f = 0; f<m1->n; f++)
         {
@@ -615,14 +700,13 @@ mtr * echMat(mtr * m1)
             {
                 m1->A[j][f] -= m1->A[i][f];
                 m2->A[j][f] -= m2->A[i][f];
-                
             }
+
             for(int f = 0; f<m1->n; f++)
             {
                 m1->A[i][f] = m1->A[i][f] / y;
                 m2->A[i][f] = m2->A[i][f] / y;
             }
-
         }
     }
 
@@ -664,6 +748,7 @@ mtr * echMat(mtr * m1)
             }
 
         }
+        
     }
     
     return m2;
@@ -699,7 +784,7 @@ mtr * invMat(mtr * m)
 
     if(detNul(m) || m->m != m->n)
     {
-        printf("\n>> la matrice n'est pas inversible:\n");
+        printf("\n>> la matrice n'est pas inversible");
         m = libererMat(m);
         sleep(3);
         m = invMat(m);
@@ -776,7 +861,6 @@ mtr * triMat(mtr * m)
                             m->A[k][c] = temp; 
                         }                        
                     }
-                    
                 }
             }
         }
@@ -936,9 +1020,10 @@ void kMat()
     m = libererMat(m);
 
 }
+
 int main()
 {
-
+    intro();
     main_menu();
 
     return 0;
