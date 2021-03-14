@@ -2,78 +2,109 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include <Windows.h>
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
+
+// PARTIE MATRICES
+
+// structure utilisee
 typedef struct mtr
 {
     float ** A;
     int m, n;
 }mtr;
 
-typedef struct elt_lc
+
+// Menus
+void main_menu();
+void AOM_menu();
+void OAP_menu();
+void CLC_menu();
+
+mtr * allMat(mtr* mat, int n, int m); //ALLOCATION DYNAMIQUE DE MATRICE
+mtr * lireMat(mtr *m);   //LECTURE DE LA MATRICE
+void affMat(mtr * m);    //AFFICHAGE
+mtr * libererMat(mtr * m);  //LIBERRATION
+
+
+mtr* addMat(); //ADDITION DE 2 MATRICES
+mtr* diffMat(); //DIFFERECE
+mtr* mulMat(); // MULITIPLICATION
+mtr* prdMat();  //PRODUIT
+mtr * invMat(); //INVERSE
+
+mtr * idMat(mtr * m1);  //RETOURNE LA MATRICE IDENTITE DE MAT
+mtr * echMat(mtr * m1); //METHODE D'INVERSEMENT PAR ECEHELONNEMENT
+bool detNul(mtr * m); //RETOURNE VRAI SI DET = 0
+
+
+//autres fonctions utilises par echMat et detNul
+bool inv(mtr * m1); //DETERMINE SI LA MATRICE EST INVERSIBLE
+void swpVect(float * a, float * b, int n); //PERMUTATION ENTRE DEUX VECTEURS
+bool linDpt(float *a, float *b, int m); //RETOURNE VRAI SI DEUX VECTEURS SONT LINEAIREMENT DEPENDANTS
+
+
+
+mtr * trnsmat(); //TRANSPOSEE DE MATRICE
+mtr * triMat(); //TRI DE MATRICE
+void Maxligne(); //VECTEUR MAXLIGNE
+void MaxColonne(); //VECTUER MAXCOLONNE
+void sousMat();
+void kMat(); //SOUS MATRICES
+
+
+// autres APs utilisees
+mtr * transMat(mtr * m1);
+void affvect(float * vect, int n);
+
+// PARTIE CHAINES DE CARACTERES ET LISTES CHAINEES
+
+//structures de donnes utilisees
+typedef struct elt_lc //liste chainees
 {
     char mot[30];
     struct elt_lc* svt;
 }elt_lc;
 
-typedef struct elt_vect
+typedef struct elt_vect //structure de mots
 {
     char c;
     struct elt_lc* L;
 }elt_vect;
 
-mtr * libererMat(mtr * m);
-mtr * allMat(mtr* mat, int n, int m);
-mtr * lireMat(mtr *m);
-void affMat(mtr * m);
-mtr* addMat();
-void AOM_menu();
-void OAP_menu();
-void CLC_menu();
-mtr* diffMat();
-mtr* mulMat();
-mtr* prdMat();
-mtr * idMat(mtr * m1);
-mtr * invMat(mtr * m);
-mtr * echMat(mtr * m1);
-mtr * triMat(mtr * m);
-mtr * trnsmat();
-mtr * transMat(mtr * m1);
-bool detNul(mtr * m);
-bool linDpt(float *a, float *b, int m);
-void Maxligne();
-void MaxColonne();
-void affvect(float * vect, int n);
-void swpVect(float * a, float * b, int n);
-void kMat();
-bool methGausse(mtr * m1);
-char ** constMatMot(char text[500], int n);
-int wordCount(char text[500]);
-void affMatMot(char** mat, int n);
-void FIFO(elt_lc** tete, char mot[30]);
-elt_vect* constVectMot(char ** mat, int n);
-void affVectMot(elt_vect* V);
-void ajoutMot(elt_vect* V);
-void SUPP(elt_lc** tete, elt_lc* p);
-elt_lc* RechMot(elt_lc* tete, char mot[30]);
-void suppMot(elt_vect* V);
-void lireText(char * text);
 
+void lireText(char * text);   //LECTURE DE TEXTE
+char ** constMatMot(char text[500], int n);  //CONSTRUCTION DE LA MATRICE A PARTIE DU TEXTE
+void affMatMot(char** mat, int n);  //AFFICHAGE DE LA MATRICE
+elt_vect* constVectMot(char ** mat, int n);  //CONSTRUCTION DE VECTUER MOTS
+void affVectMot(elt_vect* V);  //AFFICHAGE DU VECTUER
+void ajoutMot(elt_vect* V);  //AJOUT MOT
+void suppMot(elt_vect* V);  //SUPRESSION MOT
+
+// autres APs utilisees
+bool isAlpha(char c);  //DETRMINE IS UN CARACTER C DONNE EST UNE LETTRE ALPHABETIQUE
+int nbMots(char text[500]);  //RETOURNE LE NBRE DE MOTS DANS UN TEXTE
+void FIFO(elt_lc** tete, char mot[30]);  //AJOUT D'UN MOT A LA LC
+void SUPP(elt_lc** tete, elt_lc* p);    //SUPRESSION D'UN MOT DE LA LC
+elt_lc* RechMot(elt_lc* tete, char mot[30]);  //RECHERCHE UN MOT DANS UNE LC ET RETOURNE SON ADRESSE
+
+//Varibles globales
 char ** mat;
 char text[500];
 int n = 0;
 elt_vect* V;
 
 
+
 void main_menu()
 {
-    system("clear");
+    system("cls");
     printf("----------------------------------------------------MENU PRINCIPAL-----------------------------------------------------\n");
     int x;
     printf("\n\n\n\t\t\t\t1. Operations Arithmetiques sur les matrices");
     printf("\n\n\n\t\t\t\t2. Autres operations sur les matrices");
-    printf("\n\n\n\t\t\t\t3. Chaine de caracteres et listes chainees");
+    printf("\n\n\n\t\t\t\t3. Chaines de caracteres et listes chainees");
     printf("\n\n\n\t\t\t\t4. Quitter\n");
     printf("\n\n\n>> Entrer un nombre: ");
     scanf("%i", &x);
@@ -100,7 +131,7 @@ void main_menu()
 
 void AOM_menu()
 {
-    system("clear");
+    system("cls");
     printf("------------------------------------------AUTRES OPERATIONS SUR LES MATRICES-------------------------------------------\n");
     int x;
     printf("\n\n\n\t\t\t\t\t1. Transposee d'une matrice");
@@ -124,7 +155,7 @@ void AOM_menu()
             AOM_menu();
             break;
         case 2:
-            m = triMat(m);
+            m = triMat();
             affMat(m);
             m = libererMat(m);
             AOM_menu();
@@ -138,7 +169,23 @@ void AOM_menu()
             AOM_menu();
             break;
         case 5:
-            kMat();
+            system("cls");
+            printf("1.Afficher tous les sous matrices\n2.Afficher sous matrices(kxl)\n\n>>Entrez choix: ");
+            scanf("%i", &x);
+            switch(x)
+            {
+                case 1:
+                    kMat();
+                    AOM_menu();
+                    break;
+                case 2:
+                    sousMat();
+                    AOM_menu();
+                    break;
+                default:
+                    AOM_menu();
+                    break;
+            }
             AOM_menu();
             break;
         case 6:
@@ -154,11 +201,11 @@ void AOM_menu()
 
 void OAP_menu()
 {
-    system("clear");
+    system("cls");
     printf("---------------------------------------------OPERATIONS SUR LES MATRICES----------------------------------------------\n");
     printf("\n\n\n\t\t\t\t1. Somme de deux matrices");
     printf("\n\n\n\t\t\t\t2. Difference de deux matrices");
-    printf("\n\n\n\t\t\t\t3. Multipliction d'une matrice par un nombre");
+    printf("\n\n\n\t\t\t\t3. Multiplication d'une matrice par un nombre");
     printf("\n\n\n\t\t\t\t4. Produit de deux matrices");
     printf("\n\n\n\t\t\t\t5. Inverse d'une matrice");
     printf("\n\n\n\t\t\t\t6. Retour\n");
@@ -195,7 +242,7 @@ void OAP_menu()
             OAP_menu();
             break;
         case 5:
-            m = invMat(m);
+            m = invMat();
             affMat(m);
             libererMat(m);
             OAP_menu();
@@ -212,8 +259,8 @@ void OAP_menu()
 
 void CLC_menu()
 {
-    system("clear");
-    printf("----------------------------------------CHAINE DE CARACTERES ET LISTES CHAINEES-----------------------------------------\n");
+    system("cls");
+    printf("----------------------------------------CHAINES DE CARACTERES ET LISTES CHAINEES-----------------------------------------\n");
     int x;
 
     printf("\n\n\t\t\t\t\t1. Saisie de texte");
@@ -231,7 +278,7 @@ void CLC_menu()
     {
         case 1:
             lireText(text);
-            n = wordCount(text);
+            n = nbMots(text);
             CLC_menu();
             break;
         case 2:
@@ -320,6 +367,8 @@ void CLC_menu()
                 CLC_menu();
             }
             suppMot(V);
+            fflush(stdin);
+            getchar();
             affVectMot(V);
             fflush(stdin);
             getchar();
@@ -420,7 +469,7 @@ mtr * libererMat(mtr * m)
 
 mtr* addMat()
 {
-    system("clear");
+    system("cls");
     printf("----------------------------------------------ADDITION DE DEUX MATRICES-----------------------------------------------\n");
     printf("\n\n>> Entrez les deux matrices a additionner:\n");
     mtr * m1;
@@ -451,7 +500,7 @@ mtr* addMat()
 
 mtr* mulMat()
 {
-    system("clear");
+    system("cls");
     printf("----------------------------------------------MULTIPLICATION DE MATRICE----------------------------------------------\n");
     printf("\n>>Entrez la matrice:\n");
     mtr * m1;
@@ -472,7 +521,7 @@ mtr* mulMat()
 
 mtr* diffMat()
 {
-    system("clear");
+    system("cls");
     printf("----------------------------------------------DIFFERENCE DE DEUX MATRICES-----------------------------------------------\n");
     printf("\n>> Entrez les deux matrices a soustraire:\n");
     mtr * m1;
@@ -503,11 +552,11 @@ mtr* diffMat()
 
 mtr* prdMat()
 {
-    system("clear");
+    system("cls");
     printf("----------------------------------------------PRODUIT DE DEUX MATRICES----------------------------------------------\n");
     printf("\n>> Entrez les deux matrices a multiplier:\n");
 
-     mtr * m1;
+    mtr * m1;
     mtr * m2;
     do
     {
@@ -618,7 +667,7 @@ bool detNul(mtr * m)
     {
         for(int j = i+1; j<m->n; j++)
         {
-            if(linDpt(m->A[i], m->A[j], m->m) || linDpt(m2->A[i], m2->A[j], m2->m) || methGausse(m))
+            if(linDpt(m->A[i], m->A[j], m->m) || linDpt(m2->A[i], m2->A[j], m2->m) || inv(m))
             {
                 m2 = libererMat(m2);
                 return true;
@@ -629,7 +678,7 @@ bool detNul(mtr * m)
     return false;
 }
 
-bool methGausse(mtr * m)
+bool inv(mtr * m)
 {
 
     mtr * m1;
@@ -736,7 +785,7 @@ mtr * transMat(mtr * m1)
 
 mtr * trnsmat()
 {
-    system("clear");
+    system("cls");
     printf("----------------------------------------------TRANSPOSEE DE MATRICE---------------------------------------------\n");
     printf("\n>> Entrez la matrice:\n");
     mtr * m1;
@@ -886,12 +935,13 @@ mtr * idMat(mtr * m1)
     return m2;
 }
 
-mtr * invMat(mtr * m)
+mtr * invMat()
 {
-    system("clear");
+    system("cls");
     printf("------------------------------------------------INVERSE DE MATRICE-----------------------------------------------\n");
     printf("\n>> Entrez la matrice:\n");
 
+    mtr * m;
     m = lireMat(m);
 
     if(detNul(m) || m->m != m->n)
@@ -901,7 +951,7 @@ mtr * invMat(mtr * m)
         printf("\nAppuyez sur ENTRER pour continuer");
         fflush(stdin);
         getchar();
-        m = invMat(m);
+        m = invMat();
     }
 
     mtr * m2;
@@ -912,12 +962,13 @@ mtr * invMat(mtr * m)
 
 }
 
-mtr * triMat(mtr * m)
+mtr * triMat()
 {
 
-    system("clear");
+    system("cls");
     printf("-------------------------------------------------TRI DE MATRICE------------------------------------------------\n");
     printf("\n>> Entrez la matrice:\n");
+    mtr * m;
     m = lireMat(m);
 
     int x;
@@ -1000,7 +1051,7 @@ void affvect(float * vect, int n)
 
 void Maxligne()
 {
-    system("clear");
+    system("cls");
     printf("-------------------------------------------------VECTEUR MAXLIGNE-----------------------------------------------\n");
     printf("\n>> Entrez la matrice:\n");
 
@@ -1032,39 +1083,81 @@ void Maxligne()
 
 void MaxColonne()
 {
-    system("clear");
+    system("cls");
     printf("------------------------------------------------VECTEUR MAXCOLONNE-----------------------------------------------\n");
     printf("\n>> Entrez la matrice:\n");
 
     mtr * m;
     m = lireMat(m);
-    m = transMat(m);
 
     float * vect;
-    vect = (float *)malloc(m->n* sizeof(float));
+    vect = (float *)malloc(m->m* sizeof(float));
     float max;
 
-    for(int i = 0; i< m->n; i++)
+    for(int i = 0; i< m->m; i++)
     {
-        max = m->A[i][0];
-        for(int j = 0; j< m->m; j++)
+        max = m->A[0][i];
+        for(int j = 0; j< m->n; j++)
         {
-            if(m->A[i][j] >max)
+            if(m->A[j][i] >max)
             {
-                max = m->A[i][j];
+                max = m->A[j][i];
             }
         }
         vect[i] =  max;
     }
     
-    affvect(vect, m->n);
+    affvect(vect, m->m);
+    m = libererMat(m);
+
+}
+
+void sousMat()
+{
+    system("cls");
+    printf("--------------------------------------------EXTRACTION DE SOUS MATRICES----------------------------------------------\n");
+    printf("\n\n>> Entrez la matrice:\n");
+    mtr * m;
+    m = lireMat(m);
+    int k, l;
+
+    do
+    {
+        printf("\n\n>>Donnez k: ");
+        scanf("%i", &k);
+        printf("\n\n>>Donnez l: ");
+        scanf("%i", &l);
+    } while (k> m->n || l>m->m);
+    
+    printf("\n\nSous-matrices (kxl):\n");
+    
+    for(int i = 0; i<=m->n - k; i++)
+    {
+        for(int j = 0; j<=m->m - l; j++)
+        {
+            
+            for(int x = 0; x<k; x++)
+            {
+                printf("\t\t\t\t\t");
+                for(int y = 0; y<l; y++)
+                {
+                    printf("%.1f\t", m->A[i+x][j+y]);
+                }
+                printf("\n\n");
+            }
+            printf("\n\n\n");
+        }
+    }
+
+    fflush(stdin);
+    getchar();
     m = libererMat(m);
 
 }
 
 void kMat()
 {
-    system("clear");
+    system("cls");
     printf("--------------------------------------------EXTRACTION DE SOUS MATRICES----------------------------------------------\n");
     printf("\n\n>> Entrez la matrice:\n");
     mtr * m;
@@ -1074,9 +1167,7 @@ void kMat()
     fflush(stdin);
     getchar();
 
-
     int count = 1;
-
     for(int i = 0; i< m->n; i++)
     {
         for(int j = 0; j< m->m; j++)
@@ -1111,13 +1202,13 @@ void kMat()
 
 void lireText(char * text)
 {
-    system("clear");
+    system("cls");
     printf("\nEntrez le texte:\n");
     fflush(stdin);
     gets(text);
 }
 
-bool ischar(char c)
+bool isAlpha(char c)
 {
     if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
     {
@@ -1140,7 +1231,7 @@ char ** constMatMot(char text[500], int n)
 
     for(int i=0; i<strlen(text); i++)
     {
-        if(!ischar(text[i]))
+        if(!isAlpha(text[i]))
         {
             continue;
         }
@@ -1154,7 +1245,7 @@ char ** constMatMot(char text[500], int n)
             i++;
         }
 
-        while(!ischar(text[m+j-1]))
+        while(!isAlpha(text[m+j-1]))
         {
             j--;
         }
@@ -1178,7 +1269,7 @@ char ** constMatMot(char text[500], int n)
 
 }
 
-int wordCount(char text[500])
+int nbMots(char text[500])
 {
     int count = 1;
     for (int i = 0;text[i] != '\0';i++)
@@ -1194,13 +1285,13 @@ int wordCount(char text[500])
 
 void affMatMot(char** mat, int n)
 {
-    system("clear");
+    system("cls");
     printf("\n\nAffichage de la matrice de mots:\n\n");
     for(int i =0; i<n; i++)
     {
         puts(mat[i]);
     }
-    printf("/\n\nAffichage termine\nApuuyez sur ENTRER por continuer\n");
+    printf("/\n\nAffichage termine\nAppuyez sur ENTRER por continuer\n");
     
 }
 
@@ -1250,14 +1341,14 @@ elt_vect* constVectMot(char ** mat, int n)
             }
         }
     }
-    printf("\n\nStructure Construite\nApuuywz sur ENTRER pour continuer\n");
+    printf("\n\nStructure Construite\nAppuyez sur ENTRER pour continuer\n");
     return(V);
 }
 
 void affVectMot(elt_vect* V)
 {
     elt_lc* p;
-    system("clear");
+    system("cls");
     printf("\n\nAffichage de la structure de mots:\n\n");
 
     for(int i = 0; i<26; i++)
@@ -1280,8 +1371,8 @@ void affVectMot(elt_vect* V)
 void ajoutMot(elt_vect* V)
 {
     char x[30];
-    system("clear");
-    printf("\n\nDonner le mot a ajouter:");
+    system("cls");
+    printf("\n\nDonner le mot a ajouter: ");
     fflush(stdin);
     gets(x);
 
@@ -1292,7 +1383,9 @@ void ajoutMot(elt_vect* V)
             FIFO(&(V[i].L), x);
         }
     }
-    printf("\n\nMOT AJOUTE\nApuuyez sur ENTRER por continuer\n");
+    printf("\n\nMOT AJOUTE\nAppuyez sur ENTRER por continuer\n");
+    fflush(stdin);
+    getchar();
 }
 
 void SUPP(elt_lc** tete, elt_lc* p)
@@ -1345,6 +1438,7 @@ elt_lc* RechMot(elt_lc* tete, char mot[30])
         }
         p = p->svt;
     }
+    p = NULL;
     return p;
 }
 
@@ -1352,8 +1446,9 @@ void suppMot(elt_vect* V)
 {
     char x[30];
     int y;
-    system("clear");
-    printf("\n\nDonner le mot a supprimer:");
+    elt_lc* p;
+    system("cls");
+    printf("\n\nDonner le mot a supprimer: ");
     fflush(stdin);
     gets(x);
 
@@ -1362,10 +1457,16 @@ void suppMot(elt_vect* V)
     {
         if((int)V[i].c == (int)x[0] || (int)V[i].c -32 == (int)x[0])
         {
-            if(RechMot(V[i].L, x) != NULL);
+            p = RechMot(V[i].L, x);
+            if(p == NULL)
             {
+                continue;
+            }
+            else
+            {
+
                 find = true;
-                SUPP(&(V[i].L), RechMot(V[i].L, x));
+                SUPP(&(V[i].L), p);
             }
         }
     }
@@ -1382,8 +1483,6 @@ void suppMot(elt_vect* V)
 
 int main()
 {
-    
     main_menu();
-
     return 0;
 }
